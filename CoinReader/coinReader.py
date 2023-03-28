@@ -1,5 +1,8 @@
-# install these
-import serial # PySerial
+# Install these
+# pywin32
+# PySerial
+
+import serial 
 
 import http.server
 import socketserver
@@ -79,15 +82,20 @@ def activeApp():
   if platform.system() == 'Windows':
     # Import the win32gui library only if running on Windows
     import win32gui
+    import win32process
+    import psutil
     
     # Get the handle of the foreground window
     foreground_window = win32gui.GetForegroundWindow()
 
-    # Get the process ID and thread ID of the foreground window
-    process_id, thread_id = win32gui.GetWindowThreadProcessId(foreground_window)
+    # Get the process ID of the foreground window
+    process_id = win32process.GetWindowThreadProcessId(foreground_window)[1]
 
-    # Get the executable file name of the foreground process
-    executable = win32gui.GetModuleFileName(win32gui.GetModuleHandle(None))
+    # Get the process information
+    process = psutil.Process(process_id)
+
+    # Get the executable name of the foreground process
+    executable = process.name()
 
     # Print the information to the console
     return executable
