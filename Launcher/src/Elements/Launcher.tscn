@@ -1,0 +1,421 @@
+[gd_scene load_steps=35 format=2]
+
+[ext_resource path="res://Elements/Game.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Elements/Carousel.gd" type="Script" id=2]
+[ext_resource path="res://Assets/copsAndRobbers.png" type="Texture" id=3]
+[ext_resource path="res://Assets/kwXyhY.png" type="Texture" id=4]
+[ext_resource path="res://Assets/uMvsPb.png" type="Texture" id=5]
+[ext_resource path="res://Assets/rOc798.png" type="Texture" id=6]
+[ext_resource path="res://Assets/Hen4m9.png" type="Texture" id=7]
+[ext_resource path="res://Placeholder Assets/Fonts/SpaceMono-Regular.ttf" type="DynamicFontData" id=8]
+[ext_resource path="res://Placeholder Assets/Fonts/SpaceMono-Bold.ttf" type="DynamicFontData" id=9]
+[ext_resource path="res://Elements/UI Sounds/A Moment of Techno.ogg" type="AudioStream" id=10]
+[ext_resource path="res://Elements/music.gd" type="Script" id=11]
+[ext_resource path="res://Elements/UI Sounds/escape0.wav" type="AudioStream" id=12]
+[ext_resource path="res://Elements/UI Sounds/escape1.wav" type="AudioStream" id=13]
+[ext_resource path="res://Elements/Description.gd" type="Script" id=14]
+[ext_resource path="res://Assets/Black background.png" type="Texture" id=15]
+[ext_resource path="res://Elements/Instructions.gd" type="Script" id=16]
+[ext_resource path="res://Elements/UI Sounds/cursor_0.wav" type="AudioStream" id=17]
+[ext_resource path="res://Assets/cPYq31.png" type="Texture" id=18]
+[ext_resource path="res://Assets/dXpDhu.png" type="Texture" id=19]
+[ext_resource path="res://Assets/c350H3.png" type="Texture" id=20]
+[ext_resource path="res://Assets/tUlRyd.png" type="Texture" id=21]
+[ext_resource path="res://Assets/UcycF9.png" type="Texture" id=22]
+[ext_resource path="res://Assets/3pkth7.png" type="Texture" id=23]
+[ext_resource path="res://Elements/DescriptionOverlay.gd" type="Script" id=24]
+
+[sub_resource type="Shader" id=6]
+code = "shader_type canvas_item;
+
+void fragment(){
+    vec2 newuv = UV;
+    newuv.x += TIME * 0.2;
+    newuv.y += TIME * 0.5;
+    vec4 c = texture(TEXTURE, newuv);
+    COLOR = c;
+}"
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = SubResource( 6 )
+
+[sub_resource type="CanvasItemMaterial" id=1]
+blend_mode = 3
+
+[sub_resource type="DynamicFont" id=2]
+size = 25
+outline_size = 2
+outline_color = Color( 0, 0, 0, 1 )
+extra_spacing_top = -4
+font_data = ExtResource( 8 )
+
+[sub_resource type="CanvasItemMaterial" id=10]
+blend_mode = 1
+
+[sub_resource type="DynamicFontData" id=8]
+font_path = "res://Placeholder Assets/Fonts/SpaceMono-Regular.ttf"
+
+[sub_resource type="DynamicFont" id=9]
+size = 32
+outline_size = 2
+outline_color = Color( 0, 0, 0, 1 )
+extra_spacing_top = -4
+font_data = SubResource( 8 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 32
+outline_size = 2
+outline_color = Color( 0, 0, 0, 1 )
+extra_spacing_top = -4
+font_data = ExtResource( 8 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 64
+outline_size = 4
+outline_color = Color( 0, 0, 0, 1 )
+extra_spacing_top = -4
+font_data = ExtResource( 9 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 42
+outline_size = 3
+outline_color = Color( 0, 0, 0, 1 )
+extra_spacing_top = -15
+font_data = ExtResource( 8 )
+
+[node name="Launcher" type="Node2D"]
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 10 )
+volume_db = -13.127
+autoplay = true
+script = ExtResource( 11 )
+
+[node name="Move" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 17 )
+volume_db = -9.093
+
+[node name="Background" type="Node2D" parent="."]
+position = Vector2( -109.407, -425.736 )
+z_index = -2
+
+[node name="TextureRect" type="TextureRect" parent="Background"]
+material = SubResource( 7 )
+margin_left = -1366.59
+margin_top = -77.264
+margin_right = 2588.41
+margin_bottom = 2365.74
+texture = ExtResource( 15 )
+stretch_mode = 2
+
+[node name="EffectOverlay1" type="ColorRect" parent="Background"]
+material = SubResource( 1 )
+margin_left = -4212.59
+margin_top = -1776.26
+margin_right = 2560.41
+margin_bottom = 1738.74
+color = Color( 0.352941, 0.235294, 0.486275, 1 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 960, 540 )
+current = true
+
+[node name="Carousel" type="YSort" parent="."]
+position = Vector2( 960, 675 )
+script = ExtResource( 2 )
+min_scale = 0.5
+max_scale = 1.0
+move_sound = NodePath("../Move")
+exit_popup = NodePath("../ExitPopup")
+exit_sound = NodePath("../ExitPopup/PopupSound")
+exit_close = NodePath("../ExitPopup/PopupClose")
+description_path = NodePath("../DescriptionOverlay")
+far_tint = Color( 0.643137, 0.572549, 0.717647, 1 )
+unselected_tint = Color( 0.913725, 0.831373, 1, 1 )
+
+[node name="Game_cr4" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Cops and Robbers 4"
+author_name = "richy486"
+description = "Fun two player chasing game, as the robber you have to collect the diamonds, as the cop you have to catch the robber before they collect all the diamonds!
+
+https://richy486.itch.io/cops-and-robbers-4"
+Cover = ExtResource( 3 )
+game_type = 1
+file_to_run = "D:\\Games\\cr4_windows\\cr4.exe"
+
+[node name="Game_ephemeral" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Ephemeral"
+author_name = "Billy Dent"
+description = "A short game about catching bugs, picking flowers and transitioning to the afterlife.
+
+Made for the 1Bit Jam in June 2020, with the theme of death
+
+https://billy-dent.itch.io/ephemeral"
+Cover = ExtResource( 18 )
+game_type = 1
+file_to_run = "D:\\Games\\Ephemeral\\Ephemeral.exe"
+
+[node name="Game_moth" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "MOTH KOTH"
+author_name = "Max Kearney"
+description = "You know how Moths punch each other and bounce around on pink stuff? Well gather some friends and get ready to live the dream. Games go quick, so hold on.
+
+https://maxwelldexter.itch.io/moth-koth"
+Cover = ExtResource( 4 )
+game_type = 1
+file_to_run = "D:\\Games\\mothkoth_windows\\mothkoth.exe"
+
+[node name="Game_paint" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Paint Game"
+author_name = "Max & Maize Wallin"
+description = "A coloring book you can walk around!
+
+Explore the sea side town of Paint, and color in the entire world. Paint on building, birds and bee's... along with everything else.
+
+Paint Game is exactly what it says on the tin, an Interactive Coloring Book for all ages and abilities!
+
+https://mjm.itch.io/paintgame"
+Cover = ExtResource( 5 )
+game_type = 1
+file_to_run = "D:\\Games\\PaintGame-Windows\\PaintGame.exe"
+
+[node name="Game_builder" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Building Builder"
+author_name = "Koder"
+description = "In Building Builder you build buildings.
+As you build, your island expands, letting you build bigger, better, more boastful buildings.
+
+https://benkoder.itch.io/building-builder"
+Cover = ExtResource( 6 )
+game_type = 1
+file_to_run = "D:\\Games\\building-builder-win\\BuildingBuilder.exe"
+
+[node name="Game_touch" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Touch Melbourne"
+author_name = "Andrew Gleeson + Cecile Richard"
+description = "Explore the city of Melbourne through its various,
+tiny everyday interactions.
+
+https://gleeson.itch.io/touchmelbourne"
+Cover = ExtResource( 7 )
+game_type = 1
+file_to_run = "D:\\Games\\TOUCH MELBOURNE\\TOUCH MELBOURNE.exe"
+
+[node name="Game_minimal" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "On Minimalism"
+author_name = "richy486"
+description = "Move the dot with the arrow keys, avoid the stompers while working your way through the maze to find the treasure!
+
+https://richy486.itch.io/on-minimalism"
+Cover = ExtResource( 19 )
+game_type = 1
+file_to_run = "D:\\Games\\OnMinimalism5\\HelloCpp.exe"
+
+[node name="Game_dig" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Dig Dug Dead"
+author_name = "Duncan Corrigan (Art/Design) Wayne Petzler (Programming)"
+description = "Dig Dug Dead is a 2-player competitive arcade game where you carve tunnels in the earth to lead unsuspecting masses into  demonic death pits deep underground. Undercut your competitor's tunnel to re-route the unsuspecting souls and prove yourself as the superior demonic overlord.
+
+https://duncan74.itch.io/dig-dug-dead"
+Cover = ExtResource( 20 )
+game_type = 1
+file_to_run = "D:\\Games\\DigDugDead_win\\DigDugDead.exe"
+
+[node name="Game_typing" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "brandon teaches typing!"
+author_name = "Brandonhare"
+description = "learn how to type!
+
+playtime is about 15 minutes
+
+https://brandonhare.itch.io/typing"
+Cover = ExtResource( 21 )
+game_type = 2
+file_to_run = "https://brandonhare.itch.io/typing"
+
+[node name="Game_fishhat" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Fish Hat"
+author_name = "Brandonhare"
+description = "Customize your very own fish hat
+
+https://brandonhare.itch.io/fish-hat"
+Cover = ExtResource( 22 )
+game_type = 2
+file_to_run = "https://brandonhare.itch.io/fish-hat"
+
+[node name="Game_trash" parent="Carousel" instance=ExtResource( 1 )]
+game_name = "Trash Mountain"
+author_name = "Andrew Karalis"
+description = "Explore a Vertical Museum of Trash.
+
+https://andrewkaralis.itch.io/trash-mountain"
+Cover = ExtResource( 23 )
+game_type = 1
+file_to_run = "D:\\Games\\Trash Mountain\\Trash Mountain.exe"
+
+[node name="Controls" type="Label" parent="."]
+margin_left = 21.3816
+margin_top = 20.5998
+margin_right = 621.382
+margin_bottom = 863.6
+rect_scale = Vector2( 1, 0.998985 )
+custom_fonts/font = SubResource( 2 )
+text = "Select game with:
+A D
+Arrows
+D-pad
+
+Open and launch game with:
+Space
+Enter
+(A)
+
+Go back or quit launcher with:
+Esc
+(B)
+
+Hide this information with:
+Tab
+(Y)
+"
+script = ExtResource( 16 )
+
+[node name="pop" type="AudioStreamPlayer" parent="Controls"]
+stream = ExtResource( 17 )
+volume_db = -8.57
+pitch_scale = 2.07
+
+[node name="DescriptionOverlay" type="ColorRect" parent="."]
+material = SubResource( 10 )
+margin_left = 1395.0
+margin_top = 85.0
+margin_right = 8728.0
+margin_bottom = 3704.11
+color = Color( 0.972549, 0.0784314, 0.0784314, 1 )
+script = ExtResource( 24 )
+description_path_path = NodePath("description_text")
+
+[node name="description_text" type="Label" parent="DescriptionOverlay"]
+margin_right = 516.0
+margin_bottom = 982.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 9 )
+text = "Hello	"
+align = 2
+autowrap = true
+
+[node name="Description" type="Label" parent="."]
+visible = false
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 1395.0
+margin_top = 85.0
+margin_right = 1899.0
+margin_bottom = 1069.0
+rect_scale = Vector2( 1, 0.998985 )
+custom_fonts/font = SubResource( 5 )
+text = "loootse ooarestmmtmtyuaorseitmaeisrtneairsnteianseitnaesrntotnaerslntotuearsoteanoysuetnaorsent
+Open and launch game with:
+Space
+Enter
+(A)
+
+Go back or quit launcher with:
+Esc
+(B)
+
+Hide this information with:
+Tab
+(Y)
+"
+align = 2
+autowrap = true
+script = ExtResource( 14 )
+
+[node name="ExitPopup" type="ColorRect" parent="."]
+visible = false
+margin_left = 605.52
+margin_top = 346.734
+margin_right = 1348.52
+margin_bottom = 804.734
+color = Color( 0, 0.0862745, 1, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="ExitPopup"]
+margin_left = 44.2246
+margin_top = 194.497
+margin_right = 346.225
+margin_bottom = 425.497
+color = Color( 0.501961, 0.501961, 0.501961, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="ExitPopup"]
+margin_left = 402.897
+margin_top = 198.272
+margin_right = 704.897
+margin_bottom = 429.272
+color = Color( 0.501961, 0.501961, 0.501961, 1 )
+
+[node name="Instructions2" type="Label" parent="ExitPopup"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -328.958
+margin_top = 1.06152
+margin_right = 334.042
+margin_bottom = 283.062
+rect_scale = Vector2( 1, 0.998985 )
+custom_fonts/font = SubResource( 3 )
+text = "Are you sure you 
+want to quit?
+"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="option1" type="Label" parent="ExitPopup"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -311.5
+margin_top = 205.297
+margin_right = -167.5
+margin_bottom = 410.297
+rect_scale = Vector2( 1, 0.998985 )
+custom_fonts/font = SubResource( 4 )
+text = "Quit
+
+Space
+(A)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="option2" type="Label" parent="ExitPopup"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = 52.1776
+margin_top = 211.176
+margin_right = 234.178
+margin_bottom = 416.176
+rect_scale = Vector2( 1, 0.998985 )
+custom_fonts/font = SubResource( 4 )
+text = "Go Back
+
+Esc
+(B)"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PopupSound" type="AudioStreamPlayer" parent="ExitPopup"]
+stream = ExtResource( 12 )
+volume_db = -7.753
+
+[node name="PopupClose" type="AudioStreamPlayer" parent="ExitPopup"]
+stream = ExtResource( 13 )
+volume_db = -7.753
