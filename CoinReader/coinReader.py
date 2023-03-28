@@ -7,6 +7,7 @@ import threading
 import configparser
 from datetime import datetime
 import json
+import platform
 
 # port = "/dev/tty.usbserial-1410"
 # # port = "COM4"
@@ -73,6 +74,26 @@ def start_server():
 server_thread = threading.Thread(target=start_server)
 server_thread.start()
 
+
+def activeApp():
+  if platform.system() == 'Windows':
+    # Import the win32gui library only if running on Windows
+    import win32gui
+    
+    # Get the handle of the foreground window
+    foreground_window = win32gui.GetForegroundWindow()
+
+    # Get the process ID and thread ID of the foreground window
+    process_id, thread_id = win32gui.GetWindowThreadProcessId(foreground_window)
+
+    # Get the executable file name of the foreground process
+    executable = win32gui.GetModuleFileName(win32gui.GetModuleHandle(None))
+
+    # Print the information to the console
+    return executable
+  else:
+    return "unknown"
+
 print(f"Ready to loop")
 ###### Loop #######
 while(1):
@@ -95,6 +116,7 @@ while(1):
     now = datetime.now()
     date_string = now.strftime("%Y-%m-%d_%H-%M-%S")
     input_json["date"] = date_string
+    input_json["app"] = activeApp()
 
     json_string = json.dumps(input_json).replace('\\n', '').replace('\\r', '').replace('"', '')
     json_string += '\n'
