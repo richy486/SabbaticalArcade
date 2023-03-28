@@ -1,21 +1,11 @@
-# import pyfirmata
-# import time
-
-# board = pyfirmata.Arduino('/dev/tty.usbserial-1410')
-
-# while True:
-#     board.digital[13].write(1)
-#     time.sleep(1)
-#     board.digital[13].write(0)
-#     time.sleep(1)
-
-
 import serial
 
 import http.server
 import socketserver
 import threading
 import configparser
+from datetime import datetime
+import json
 
 # port = "/dev/tty.usbserial-1410"
 # # port = "COM4"
@@ -91,12 +81,27 @@ while(1):
 
     # Read data out of the buffer until a carraige return / new line is found
     serialString = serialPort.readline().decode('Ascii')
-
-    # Print the contents of the serial data
     print(serialString)
 
+    # Parse the string into command:value elements
+    command_value_pairs = serialString.split("&")
+    input_json = {}
+    for pair in command_value_pairs:
+      command, value = pair.split(":")
+      input_json[command] = value
+
+    # Add the current date and time to the dictionary
+    now = datetime.now()
+    date_string = now.strftime("%Y-%m-%d_%H-%M-%S")
+    input_json["date"] = date_string
+
+    json_string = json.dumps(input_json).replace('\\n', '').replace('\\r', '').replace('"', '')
+    json_string += '\n'
+    print(json_string)
+
     file = open("coinLog.txt", "a")
-    file.write(serialString)
+
+    file.write(json_string)
     file.close()
 
     # # Tell the device connected over the serial port that we recevied the data!
