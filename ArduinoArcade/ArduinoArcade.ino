@@ -4,6 +4,10 @@
  * uses current time instead of a straight counter.
  */
 
+/*  Install these
+ *   Adafruit Thermal Printer library
+ */
+
 #include <EEPROM.h>
 #include <Adafruit_Thermal.h>
 #include <SoftwareSerial.h>

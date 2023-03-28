@@ -1,4 +1,5 @@
-import serial
+# install these
+import serial # PySerial
 
 import http.server
 import socketserver
