@@ -15,13 +15,31 @@ import serial
 import http.server
 import socketserver
 import threading
+import configparser
 
-port = "/dev/tty.usbserial-1410"
-# port = "COM4"
+# port = "/dev/tty.usbserial-1410"
+# # port = "COM4"
+
+print(f"ARCADE!!")
+
+config = configparser.ConfigParser()
+config['ARDUINO'] = {'Port': 'COM4'}
+config.read('config.ini')
+
+with open('config.ini', 'w') as configfile:
+  config.write(configfile)
+
+
+arduinoPort = config['ARDUINO']['Port']
+print(f"Trying Arduino on: {arduinoPort}")
+
+# quit()
 
 ###### Setup ######
 
-serialPort = serial.Serial(port = port, 
+
+
+serialPort = serial.Serial(port = arduinoPort, 
                           baudrate=9600,
                           bytesize=8,
                           timeout=2,
