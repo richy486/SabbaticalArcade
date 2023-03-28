@@ -1,6 +1,8 @@
 # Install these
 # pywin32
+# psutil
 # PySerial
+
 
 import serial 
 
