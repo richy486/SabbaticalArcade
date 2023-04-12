@@ -19,28 +19,34 @@ import platform
 
 print(f"ARCADE!!")
 
+IGNORE_COIN_READER = True
+
 config = configparser.ConfigParser()
 config['ARDUINO'] = {'Port': 'COM4'}
+config['COINREADER'] = {'Ignore': 0}
+
 config.read('config.ini')
 
 with open('config.ini', 'w') as configfile:
   config.write(configfile)
 
 
-arduinoPort = config['ARDUINO']['Port']
-print(f"Trying Arduino on: {arduinoPort}")
+ARDUINO_PORT = config['ARDUINO']['Port']
+IGNORE_COIN_READER = config['COINREADER']['ignore']
+
+print(f"IGNORE_COIN_READER: {IGNORE_COIN_READER}")
 
 # quit()
 
 ###### Setup ######
 
-
-
-serialPort = serial.Serial(port = arduinoPort, 
-                          baudrate=9600,
-                          bytesize=8,
-                          timeout=2,
-                          stopbits=serial.STOPBITS_ONE)
+if IGNORE_COIN_READER == False:
+  print(f"Trying Arduino on: {ARDUINO_PORT}")
+  serialPort = serial.Serial(port = ARDUINO_PORT, 
+                            baudrate=9600,
+                            bytesize=8,
+                            timeout=2,
+                            stopbits=serial.STOPBITS_ONE)
 
 serialString = ""                           # Used to hold data coming over UART
 
@@ -62,8 +68,9 @@ class MyAPIHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(response)
 
         # Send to Arduino via serial.
-        stripped_string = post_data.decode().replace(" ", "").replace("\n", "").replace("\t", "")
-        serialPort.write(stripped_string)
+        if IGNORE_COIN_READER == False:
+          stripped_string = post_data.decode().replace(" ", "").replace("\n", "").replace("\t", "")
+          serialPort.write(stripped_string)
 
 
 # Set up the server
@@ -109,7 +116,7 @@ print(f"Ready to loop")
 while(1):
 
   # Wait until there is data waiting in the serial buffer
-  if(serialPort.in_waiting > 0):
+  if IGNORE_COIN_READER == False and (serialPort.in_waiting > 0):
 
     # Read data out of the buffer until a carraige return / new line is found
     serialString = serialPort.readline().decode('Ascii')
