@@ -13,17 +13,16 @@ import configparser
 from datetime import datetime
 import json
 import platform
+import time
 
 # port = "/dev/tty.usbserial-1410"
 # # port = "COM4"
 
 print(f"ARCADE!!")
 
-IGNORE_COIN_READER = True
-
 config = configparser.ConfigParser()
-config['ARDUINO'] = {'Port': 'COM4'}
-config['COINREADER'] = {'Ignore': 0}
+config['ARDUINO'] = {'port': 'COM4'}
+config['ARDUINO'] = {'ignore': 0}
 
 config.read('config.ini')
 
@@ -31,16 +30,26 @@ with open('config.ini', 'w') as configfile:
   config.write(configfile)
 
 
-ARDUINO_PORT = config['ARDUINO']['Port']
-IGNORE_COIN_READER = config['COINREADER']['ignore']
+ARDUINO_PORT = config['ARDUINO']['port']
 
-print(f"IGNORE_COIN_READER: {IGNORE_COIN_READER}")
+IGNORE_ARDUINO_SERIAL = 0
+# IGNORE_ARDUINO_SERIAL = config['ARDUINO']['ignore'] == "1" ? 1 : 0
+if config['ARDUINO']['ignore'] == "1":
+  IGNORE_ARDUINO_SERIAL = 1
+
+print(f"IGNORE_ARDUINO_SERIAL: {IGNORE_ARDUINO_SERIAL} ")
+print(type(IGNORE_ARDUINO_SERIAL))
+
+if IGNORE_ARDUINO_SERIAL == 0:
+  print("NOT ignoring")
+else:
+  print("ignoring")
 
 # quit()
 
 ###### Setup ######
 
-if IGNORE_COIN_READER == False:
+if IGNORE_ARDUINO_SERIAL == 0:
   print(f"Trying Arduino on: {ARDUINO_PORT}")
   serialPort = serial.Serial(port = ARDUINO_PORT, 
                             baudrate=9600,
@@ -68,9 +77,13 @@ class MyAPIHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(response)
 
         # Send to Arduino via serial.
-        if IGNORE_COIN_READER == False:
-          stripped_string = post_data.decode().replace(" ", "").replace("\n", "").replace("\t", "")
-          serialPort.write(stripped_string)
+        if IGNORE_ARDUINO_SERIAL == 0:
+          lines = post_data.decode().split("\n")
+          for line in lines:
+            print(f"Sending to arduino: {line}")
+            encoded_string = line.encode()
+            serialPort.write(encoded_string)
+            time.sleep(3)
 
 
 # Set up the server
@@ -116,7 +129,7 @@ print(f"Ready to loop")
 while(1):
 
   # Wait until there is data waiting in the serial buffer
-  if IGNORE_COIN_READER == False and (serialPort.in_waiting > 0):
+  if IGNORE_ARDUINO_SERIAL == 0 and (serialPort.in_waiting > 0):
 
     # Read data out of the buffer until a carraige return / new line is found
     serialString = serialPort.readline().decode('Ascii')
