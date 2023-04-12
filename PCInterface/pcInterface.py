@@ -15,6 +15,10 @@ import json
 import platform
 import time
 
+import base64
+from PIL import Image
+import io
+
 # port = "/dev/tty.usbserial-1410"
 # # port = "COM4"
 
@@ -61,29 +65,57 @@ serialString = ""                           # Used to hold data coming over UART
 
 # Define the API handler
 class MyAPIHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-        self.end_headers()
-        self.wfile.write(b'Hello, World!')
+  def do_GET(self):
+    self.send_response(200)
+    self.send_header('Content-type', 'text/plain')
+    self.end_headers()
+    self.wfile.write(b'Hello, World!')
 
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        self.send_response(200)
-        self.send_header('Content-type', 'text/plain')
-        self.end_headers()
-        response = b'You sent: ' + post_data
-        self.wfile.write(response)
+  def do_POST(self):
+    content_length = int(self.headers['Content-Length'])
+    post_data = self.rfile.read(content_length)
+    self.send_response(200)
+    self.send_header('Content-type', 'text/plain')
+    self.end_headers()
+    response = b'You sent: ' + post_data
+    self.wfile.write(response)
 
-        # Send to Arduino via serial.
-        if IGNORE_ARDUINO_SERIAL == 0:
-          lines = post_data.decode().split("\n")
-          for line in lines:
-            print(f"Sending to arduino: {line}")
-            encoded_string = line.encode()
-            serialPort.write(encoded_string)
-            time.sleep(3)
+    # Decode JSON
+    python_object = json.loads(post_data.decode())
+    # print(python_object)
+
+    if "print" in python_object and isinstance(python_object["print"], list):
+      for item in python_object["print"]:
+        print(item)
+        if "text" in item and isinstance(item["text"], str):
+          
+          textString = "text:" + item["text"]
+          print(f"Sending to arduino: {textString}")
+          encoded_string = textString.encode()
+          serialPort.write(encoded_string)
+          time.sleep(3)
+        if "image" in item and isinstance(item["image"], str):
+          # convert base64 image to byte array
+          #    
+
+          base64_str = item["image"]
+          print("base64_str:", base64_str)
+
+          data, size = convert_image_to_1bpp(base64_str)
+          print("Byte array:", data)
+          print("Size:", size)
+
+
+
+        # # Send to Arduino via serial.
+        # if IGNORE_ARDUINO_SERIAL == 0:
+        #   lines = post_data.decode().split("\n")
+        #   for line in lines:
+        #     print(f"Sending to arduino: {line}")
+        #     encoded_string = line.encode()
+        #     serialPort.write(encoded_string)
+        #     time.sleep(3)
+  
 
 
 # Set up the server
@@ -124,6 +156,29 @@ def activeApp():
   else:
     return "unknown"
 
+def convert_image_to_1bpp(base64_str):
+  # Decode the base64 string to bytes
+  data = base64.b64decode(base64_str)
+
+  # # Load the image from bytes
+  # img = Image.frombytes("L", (int(len(data)*8**0.5), int(len(data)*8**0.5)), data)
+  # Load image as PIL Image object
+  img = Image.open(io.BytesIO(data))
+
+  # Convert the image to 1 bit per pixel
+  img_bw = img.convert("1")
+
+  # Get the image data as a byte array
+  byte_array = img_bw.tobytes()
+
+  # Get the image size
+  size = img_bw.size
+
+
+  formattedString = ", ".join("0x{:02X}".format(b) for b in byte_array)
+
+  return formattedString, size
+
 print(f"Ready to loop")
 ###### Loop #######
 while(1):
@@ -135,20 +190,45 @@ while(1):
     serialString = serialPort.readline().decode('Ascii')
     print(serialString)
 
+    output_json = {}
+
     # Parse the string into command:value elements
     command_value_pairs = serialString.split("&")
-    input_json = {}
+    # for pair in command_value_pairs:
+    #   command, value = pair.split(":")
+    #   output_json[command] = value
+
+
     for pair in command_value_pairs:
-      command, value = pair.split(":")
-      input_json[command] = value
+      # command, value = pair.split(":")
+      command_value = pair.split(":", 1)
+      if len(command_value) != 2:
+        print("Error: separator not found in string " + pair)
+        continue
+      command, value = command_value
+      output_json[command] = value
+
+
+    # print("command_value_pairs:")
+    # for item in command_value_pairs:
+    #   print(item)
+
+
+    
+
+
+
+
+
+
 
     # Add the current date and time to the dictionary
     now = datetime.now()
     date_string = now.strftime("%Y-%m-%d_%H-%M-%S")
-    input_json["date"] = date_string
-    input_json["app"] = activeApp()
+    output_json["date"] = date_string
+    output_json["app"] = activeApp()
 
-    json_string = json.dumps(input_json).replace('\\n', '').replace('\\r', '').replace('"', '')
+    json_string = json.dumps(output_json).replace('\\n', '').replace('\\r', '').replace('"', '')
     json_string += '\n'
     print(json_string)
 

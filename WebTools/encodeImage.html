@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Drop Image to Display Base64 String</title>
+</head>
+<body>
+  <h1>Drop Image to Display Base64 String</h1>
+  <p>Drop an image on this page to display its base64 encoded string:</p>
+
+
+
+  <div id="drop_zone" style="border: 2px dashed #ccc; padding: 20px; width: 400px; height: 400px;">
+    <p>Drop image here</p>
+  </div>
+
+  <div id="inputImage"></div>
+  <div id="outputImage"></div>
+  <div id="encoding"></div>
+
+  
+
+  <!-- <img src="data:image/png;base64,EBD//4D/gL+A/4D/gP+AP4APgAeAH4B/h/+//////////w==" alt="Base64 Image"> -->
+  
+
+  <script>
+    function handleDrop(e) {
+      e.preventDefault();
+      var file = e.dataTransfer.files[0];
+      var reader = new FileReader();
+
+      reader.onload = function (event) {
+
+
+        inputImageDiv.innerHTML = 'Input: <img src="' + event.target.result + '">';
+
+
+        var image = new Image();
+        image.onload = function() {
+          // outputImageDiv.innerHTML = '<img src="data:image/png;base64, ' + base64String + '">';   
+          // .replace(/^data:image\/(png|jpg);base64,/, '')
+          // data:image/png;base64,
+
+          // Call your function to convert the image to base64 and display it
+          const base64String = convertImageToBase64(this);
+          encodingDiv.innerHTML = '<p>Base64 Encoded String:</p><pre>' + base64String.replace(/^data:image\/(png|jpg);base64,/, '') + '</pre>';        
+          outputImageDiv.innerHTML = 'Output: <img src="' + base64String + '">';   
+        };
+        image.onerror = (error) => {
+          encodingDiv.innerHTML = '<p>Error:</p><pre>' + error + '</pre>';      
+          outputImageDiv.innerHTML = '';
+        };
+        image.src = event.target.result;
+        
+
+
+        
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function convertImageToBase64(image) {
+      // Create a canvas to draw the image
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0);
+
+      // Convert the image to black-and-white with 1 bit per pixel
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        const r = imageData.data[i];
+        const g = imageData.data[i + 1];
+        const b = imageData.data[i + 2];
+        const a = imageData.data[i + 3];
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        if (luminance < 128) {
+          imageData.data[i] = 0;
+          imageData.data[i + 1] = 0;
+          imageData.data[i + 2] = 0;
+        } else {
+          imageData.data[i] = 255;
+          imageData.data[i + 1] = 255;
+          imageData.data[i + 2] = 255;
+        }
+        imageData.data[i + 3] = a;
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      // Get the image data as a base64 string
+      const base64Data = canvas.toDataURL('image/png');
+      return base64Data;
+
+
+      // // Convert the image to 1 bit per pixel
+      // const threshold = 128;
+      // const data = new Uint8Array(canvas.width * canvas.height / 8);
+      // let dataIndex = 0;
+      // let bitIndex = 0;
+      // for (let i = 0; i < imageData.data.length; i += 4) {
+      //   const r = imageData.data[i];
+      //   if (r < threshold) {
+      //     data[dataIndex] |= (1 << (7 - bitIndex));
+      //   }
+      //   bitIndex++;
+      //   if (bitIndex === 8) {
+      //     bitIndex = 0;
+      //     dataIndex++;
+      //   }
+      // }
+
+      // // Encode the byte array as base64
+      // const base64Data = btoa(String.fromCharCode(...data));
+      // return base64Data;
+    }
+
+    function convertImageToBase64_notworking(image) {
+      
+      // Create a canvas to draw the image
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0);
+
+      // Convert the image to black-and-white with 1 bit per pixel
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        const r = imageData.data[i];
+        const g = imageData.data[i + 1];
+        const b = imageData.data[i + 2];
+        const a = imageData.data[i + 3];
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        if (luminance < 128) {
+          imageData.data[i] = 0;
+          imageData.data[i + 1] = 0;
+          imageData.data[i + 2] = 0;
+        } else {
+          imageData.data[i] = 255;
+          imageData.data[i + 1] = 255;
+          imageData.data[i + 2] = 255;
+        }
+        imageData.data[i + 3] = a;
+      }
+      ctx.putImageData(imageData, 0, 0);
+
+      // Convert the image data to a byte array
+      const data = new Uint8Array(canvas.width * canvas.height / 8);
+      let dataIndex = 0;
+      let bitIndex = 0;
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        const r = imageData.data[i];
+        if (r === 0) {
+          data[dataIndex] |= (1 << (7 - bitIndex));
+        }
+        bitIndex++;
+        if (bitIndex === 8) {
+          bitIndex = 0;
+          dataIndex++;
+        }
+      }
+
+      // Encode the byte array as base64 with size information
+      const base64Data = btoa(String.fromCharCode(...new Uint8Array([image.width, image.height])) + String.fromCharCode(...data));
+      return base64Data;
+    }
+
+    
+
+    const dropZone = document.getElementById('drop_zone');
+    const inputImageDiv = document.getElementById('inputImage');
+    const outputImageDiv = document.getElementById('outputImage');
+    const encodingDiv = document.getElementById('encoding');
+
+    dropZone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      dropZone.style.backgroundColor = '#eee';
+    });
+
+    dropZone.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      dropZone.style.backgroundColor = '';
+    });
+
+    dropZone.addEventListener('drop', handleDrop);
+  </script>
+</body>
+</html>
