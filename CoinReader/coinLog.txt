@@ -1,8 +1,0 @@
-{total: 3.80, date: 2023-03-28_17-49-42}
-{coin: 0.20, total: 4.00, date: 2023-03-28_17-49-48}
-{total: 4.00, date: 2023-03-28_18-27-47, app: cmd.exe}
-{coin: 0.20, total: 4.20, date: 2023-03-28_18-28-20, app: cr4.exe}
-{coin: 0.20, total: 4.40, date: 2023-03-28_19-14-42, app: notepad.exe}
-{coin: 0.50, total: 4.90, date: 2023-03-28_19-53-29, app: PaintGame.exe}
-{coin: 1.00, total: 5.90, date: 2023-03-28_19-53-37, app: Godot_v3.5.1-stable_win64.exe}
-{coin: 2.00, total: 7.90, date: 2023-03-28_19-53-50, app: HelloCpp.exe}
