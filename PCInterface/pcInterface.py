@@ -87,6 +87,8 @@ class MyAPIHandler(http.server.BaseHTTPRequestHandler):
     if "print" in python_object and isinstance(python_object["print"], list):
       for item in python_object["print"]:
         print(item)
+
+        ## TEXT ##
         if "text" in item and isinstance(item["text"], str):
           
           textString = "text:" + item["text"]
@@ -94,6 +96,8 @@ class MyAPIHandler(http.server.BaseHTTPRequestHandler):
           encoded_string = textString.encode()
           serialPort.write(encoded_string)
           time.sleep(3)
+
+        ## IMAGE ##
         if "image" in item and isinstance(item["image"], str):
           # convert base64 image to byte array
           #    
@@ -101,20 +105,31 @@ class MyAPIHandler(http.server.BaseHTTPRequestHandler):
           base64_str = item["image"]
           print("base64_str:", base64_str)
 
-          data, size = convert_image_to_1bpp(base64_str)
-          print("Byte array:", data)
+          byteArrayString, size = convert_image_to_1bpp(base64_str)
+          print("Byte array:", byteArrayString)
           print("Size:", size)
 
+          if len(size) != 2:
+            print("Error: No size info")
+            continue
 
+          arduinoSizeString = "bitmapWidth:" + str(size[0]) + "&bitmapHeight:" + str(size[1])
+          print(f"Sending to arduino: {arduinoSizeString}")
+          encoded_arduinoSizeString = arduinoSizeString.encode()
+          serialPort.write(encoded_arduinoSizeString)
+          time.sleep(3)
 
-        # # Send to Arduino via serial.
-        # if IGNORE_ARDUINO_SERIAL == 0:
-        #   lines = post_data.decode().split("\n")
-        #   for line in lines:
-        #     print(f"Sending to arduino: {line}")
-        #     encoded_string = line.encode()
-        #     serialPort.write(encoded_string)
-        #     time.sleep(3)
+          split_strings = [byteArrayString[i:i+94] for i in range(0, len(byteArrayString), 96)]
+          print(split_strings)
+
+          print("split " + str(len(split_strings)) +  ": ")
+          for byteArrayLine in split_strings:
+            arduinoByteArrayLine = "bitmapData:" + byteArrayLine
+            print(f"Sending to arduino: {arduinoByteArrayLine}")
+            encoded_arduinoByteArrayLine = arduinoByteArrayLine.encode()
+            serialPort.write(encoded_arduinoByteArrayLine)
+            time.sleep(3)
+
   
 
 
