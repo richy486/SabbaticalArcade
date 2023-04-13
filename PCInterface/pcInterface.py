@@ -129,7 +129,13 @@ class MyAPIHandler(http.server.BaseHTTPRequestHandler):
             encoded_arduinoByteArrayLine = arduinoByteArrayLine.encode()
             serialPort.write(encoded_arduinoByteArrayLine)
             time.sleep(3)
-
+        
+        ## FEED ##
+        if "feed" in item:
+          print(f"Sending FEED arduino")
+          encoded_arduinoFeed = "feed:".encode()
+          serialPort.write(encoded_arduinoFeed)
+          time.sleep(3)
   
 
 
