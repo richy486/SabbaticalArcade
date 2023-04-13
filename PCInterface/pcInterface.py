@@ -181,8 +181,6 @@ def convert_image_to_1bpp(base64_str):
   # Decode the base64 string to bytes
   data = base64.b64decode(base64_str)
 
-  # # Load the image from bytes
-  # img = Image.frombytes("L", (int(len(data)*8**0.5), int(len(data)*8**0.5)), data)
   # Load image as PIL Image object
   img = Image.open(io.BytesIO(data))
 
@@ -211,14 +209,14 @@ while(1):
     serialString = serialPort.readline().decode('Ascii')
     print(serialString)
 
+    # Skip debug prints.
+    if serialString.startswith("## "):
+      continue
+
     output_json = {}
 
     # Parse the string into command:value elements
     command_value_pairs = serialString.split("&")
-    # for pair in command_value_pairs:
-    #   command, value = pair.split(":")
-    #   output_json[command] = value
-
 
     for pair in command_value_pairs:
       # command, value = pair.split(":")
@@ -228,20 +226,6 @@ while(1):
         continue
       command, value = command_value
       output_json[command] = value
-
-
-    # print("command_value_pairs:")
-    # for item in command_value_pairs:
-    #   print(item)
-
-
-    
-
-
-
-
-
-
 
     # Add the current date and time to the dictionary
     now = datetime.now()

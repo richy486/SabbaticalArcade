@@ -34,28 +34,28 @@ void setupPrinter() {
 
 void loopSerialInput(unsigned long currentTime) {
   if (checkSerial()) {
-    Serial.println("end line input");
+    Serial.println("## end line input");
 
     if (text != NULL) {
-      Serial.print("text: " );
+      Serial.print("## text " );
       Serial.println(text);
       printText();
-      Serial.println("=== end of text===");
+      Serial.println("## === end of text===");
       clear();
     }
 
     if (bitmapWidth != 0 && bitmapHeight != 0) {
-      Serial.print("width: " );
+      Serial.print("## width " );
       Serial.print(bitmapWidth);            
-      Serial.print(" height: " );
+      Serial.print(" height " );
       Serial.println(bitmapHeight);
       
-      Serial.print("bitmapPos: ");
+      Serial.print("## bitmapPos ");
       Serial.print(bitmapPos);
       Serial.println(" ");
       if (bitmapPos >= (bitmapWidth * bitmapHeight) / 8) {
         printImage();
-        Serial.println("=== end of bitmap ===");
+        Serial.println("## === end of bitmap ===");
         clear();
       }
     }
@@ -84,9 +84,9 @@ bool checkSerial() {
       *value = 0;
       ++value;
 
-      Serial.print("command: " );
+      Serial.print("## command " );
       Serial.print(command);
-      Serial.print(" value: " );
+      Serial.print(" value " );
       Serial.println(value);
 
       if (strcmp(command, "clear") == 0) {
@@ -110,16 +110,16 @@ bool checkSerial() {
       if (strcmp(command, "bitmapData") == 0) {
 
         if (bitmapHeight == 0 || bitmapWidth == 0) {
-          Serial.print("Error, width and height can't be zero before receiving bitmap data. width: " );
+          Serial.print("## Error, width and height can't be zero before receiving bitmap data. width " );
           Serial.print(bitmapWidth);            
-          Serial.print(" height: " );
+          Serial.print(" height " );
           Serial.println(bitmapHeight);
           return false;
         }
         if (bitmapWidth % 8 != 0 || bitmapHeight % 8 != 0) {          
-          Serial.print("Error, width and height must be a multiple of 8. width: " );
+          Serial.print("## Error, width and height must be a multiple of 8. width " );
           Serial.print(bitmapWidth);            
-          Serial.print(" height: " );
+          Serial.print(" height " );
           Serial.println(bitmapHeight);
         }
         if (bitmapData == NULL) {
@@ -159,8 +159,8 @@ void clear() {
   bitmapData = NULL;
   bitmapPos = 0;
 
-  Serial.print("hasPaper: " ); Serial.println(printer.hasPaper());
-  Serial.println("-= Clear =-");
+  Serial.print("## hasPaper " ); Serial.println(printer.hasPaper());
+  Serial.println("## -= Clear =-");
   
 }
 
@@ -172,7 +172,7 @@ void printBlank(int lines) {
 
 void printText() {
   if (text == NULL) {
-    Serial.println("No text to print");
+    Serial.println("## No text to print");
   }
 
   printer.wake();       // MUST wake() before printing again, even if reset
@@ -184,7 +184,7 @@ void printText() {
 
 void printImage() {
   if (bitmapWidth == 0 || bitmapHeight == 0 || bitmapData == NULL) {
-    Serial.println("Incorrect data for image print");
+    Serial.println("## Incorrect data for image print");
   }
 
   printer.wake();       // MUST wake() before printing again, even if reset
